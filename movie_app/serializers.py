@@ -1,5 +1,45 @@
 from rest_framework import serializers
-from .models import Directors,Movie,Review
+from .models import Directors, Movie, Review, Genre, Tag
+
+
+class ReviewSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = '__all__'
+
+
+class GenreSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Genre
+        fields = 'id name'.split()
+
+
+class TagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = 'id name'.split()
+
+
+class MovieSerailizer(serializers.ModelSerializer):
+    genre = GenreSerializer()
+    tags = TagSerializer(many=True)
+    tag_list = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Movie
+        fields = 'id title genre tags rating tag_list'.split()
+
+    def get_tag_list(self, movies):
+        print(movies)
+        return [i.name for i in movies.tags.all()]
+
+
+class MovieDetailSerializers(serializers.ModelSerializer):
+    reviews = ReviewSerializers(many=True)
+
+    class Meta:
+        model = Movie
+        fields = 'id title tags tag_list rating reviews'.split()
 
 
 class DirectorSerializers(serializers.ModelSerializer):
@@ -14,26 +54,7 @@ class DirectorDetailSerializers(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class ReviewSerializers(serializers.ModelSerializer):
-    class Meta:
-        model = Review
-        fields = 'id'.split()
-
-
 class ReviewDetailSerializers(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = '__all__'
-
-
-class MovieSerailizer(serializers.ModelSerializer):
-    class Meta:
-        model = Movie
-        fields = 'id'.split()
-
-
-class MovieDetailSerializers(serializers.ModelSerializer):
-    class Meta:
-        model = Movie
-        fields = '__all__'
-

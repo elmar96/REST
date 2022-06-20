@@ -1,3 +1,4 @@
+from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .serializers import MovieSerailizer, MovieDetailSerializers, DirectorSerializers, \
@@ -42,6 +43,15 @@ def movie_list_view(request):
 
 @api_view(['GET'])
 def movie_detail_view(request, id):
+    try:
+        movies = Movie.objects.get(id=id)
+    except Movie.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND,
+                        data={'error': 'no such movie!'})
+    # Получить все отзывы фильтр
+    # reviews = movies.reviews.all()
+    # Отзывы по фильму ручной филтр
+    # reviews = Review.objects.filter(movies=movies)
     movies = Movie.objects.get(id=id)
     data = MovieDetailSerializers(movies, many=False).data
     return Response(data=data)
