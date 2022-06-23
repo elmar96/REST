@@ -45,7 +45,7 @@ class MovieDetailSerializers(serializers.ModelSerializer):
 class DirectorSerializers(serializers.ModelSerializer):
     class Meta:
         model = Directors
-        fields = 'id'.split()
+        fields = 'id name'.split()
 
 
 class DirectorDetailSerializers(serializers.ModelSerializer):

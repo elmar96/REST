@@ -27,8 +27,8 @@ class Movie(models.Model):
     tags = models.ManyToManyField(Tag, blank=True)
     title = models.TextField(null=True, blank=True)
     description = models.TextField(null=True, blank=True)
-    duration = models.PositiveIntegerField()
-    director = models.ForeignKey(Directors, on_delete=models.CASCADE, related_name="directors")
+    duration = models.PositiveIntegerField(null=True)
+    director = models.ForeignKey(Directors, on_delete=models.CASCADE,null=True, related_name="directors")
 
     # def __str__(self):
     #     return self.name
