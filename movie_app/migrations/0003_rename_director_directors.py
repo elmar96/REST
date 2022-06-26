@@ -6,12 +6,12 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('movie_app', '0002_movie_remove_director_created_at_and_more'),
+        ("movie_app", "0002_movie_remove_director_created_at_and_more"),
     ]
 
     operations = [
         migrations.RenameModel(
-            old_name='Director',
-            new_name='Directors',
+            old_name="Director",
+            new_name="Directors",
         ),
     ]

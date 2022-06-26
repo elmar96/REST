@@ -1,129 +1,170 @@
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .serializers import MovieSerailizer, MovieDetailSerializers, DirectorSerializers, \
-    DirectorDetailSerializers, ReviewSerializers, ReviewDetailSerializers
+
 from .models import Movie, Directors, Review
+from .serializers import (
+    MovieSerailizer,
+    MovieDetailSerializers,
+    DirectorSerializers,
+    DirectorDetailSerializers,
+    ReviewSerializers,
+    ReviewDetailSerializers,
+    MovieValidateSerializer,
+    DirectorValidateSerializer,
+    ReviewValidateSerializer,
+)
 
 
-@api_view(['GET','POST'])
+@api_view(["GET", "POST"])
 def director_list_view(request):
-    if request.method == 'GET':
+    if request.method == "GET":
         directors = Directors.objects.all()
         data = DirectorSerializers(directors, many=True).data
         return Response(data=data)
     else:
-        name = request.data.get('name')
-        director = Directors.objects.create(
-            name=name
-        )
+        serializer = DirectorValidateSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(
+                status=status.HTTP_406_NOT_ACCEPTABLE,
+                data={"errors": serializer.errors},
+            )
+        name = serializer.validated_data["name"]
+        director = Directors.objects.create(name=name)
         director.save()
-        return Response(status=status.HTTP_201_CREATED,
-                        data={'message': "Director created",
-                              "director": DirectorDetailSerializers(name).data})
+        return Response(
+            status=status.HTTP_201_CREATED,
+            data={
+                "message": "Director created",
+                "director": DirectorDetailSerializers(name).data,
+            },
+        )
 
-@api_view(['GET'])
+
+@api_view(["GET"])
 def director_detail_view(request, id):
     directors = Directors.objects.get(id=id)
     data = DirectorDetailSerializers(directors, many=False).data
     return Response(data=data)
 
 
-@api_view(['GET', 'POST'])
+@api_view(["GET", "POST"])
 def review_list_view(request):
-    if request.method == 'GET':
+    if request.method == "GET":
         review = Review.objects.all()
         data = ReviewSerializers(review, many=True).data
         return Response(data=data)
     else:
-        text = request.data.get('text', '')
-        stars = request.data.get('stars', 0)
-        movie_id = request.data.get('movie_id')
-        review = Review.objects.create(
-            text=text,
-            stars=stars,
-            movie_id=movie_id
-        )
+        serializer = ReviewValidateSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(
+                status=status.HTTP_406_NOT_ACCEPTABLE,
+                data={"errors": serializer.errors},
+            )
+        text = serializer.validated_data["text"]
+        stars = serializer.validated_data["stars"]
+        movie_id = serializer.validated_data["movie_id"]
+        review = Review.objects.create(text=text, stars=stars, movie_id=movie_id)
         review.save()
-        return Response(status=status.HTTP_201_CREATED,
-                        data={'message': 'Review created',
-                              'review':ReviewDetailSerializers(review).data})
+        return Response(
+            status=status.HTTP_201_CREATED,
+            data={
+                "message": "Review created",
+                "review": ReviewDetailSerializers(review).data,
+            },
+        )
 
 
-@api_view(['GET','PUT','DELETE'])
+@api_view(["GET", "PUT", "DELETE"])
 def review_detail_view(request, id):
     review = Review.objects.get(id=id)
-    if request.method == 'GET':
+    if request.method == "GET":
         data = ReviewDetailSerializers(review, many=False).data
         return Response(data=data)
-    elif request.method == 'DELETE':
+    elif request.method == "DELETE":
         review.delete()
-        return Response(data={'message': "Review removed"})
+        return Response(data={"message": "Review removed"})
     else:
-        review.text = request.data.get('text')
-        review.stars = request.data.get('stars')
-        review.movie_id = request.data.get('movie_id')
+        serializer = MovieValidateSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(
+                status=status.HTTP_406_NOT_ACCEPTABLE,
+                data={"errors": serializer.errors},
+            )
+        review.text = serializer.validated_data["text"]
+        review.stars = serializer.validated_data["stars"]
+        review.movie_id = serializer.validated_data["movie_id"]
         review.save()
         return Response(data=ReviewDetailSerializers(review).data)
 
 
-@api_view(['GET', 'POST'])
+@api_view(["GET", "POST"])
 def movie_list_view(request):
-    if request.method == 'GET':
+    if request.method == "GET":
         movies = Movie.objects.all()
         data = MovieSerailizer(movies, many=True).data
         return Response(data=data)
     else:
-        title = request.data.get('title', '')
-        description = request.data.get("description", "")
-        duration = request.data.get("duration", 0)
-        genre_id = request.data.get('genre_id')
-        tags = request.data.get('tags', [])
+        serializer = MovieValidateSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(
+                status=status.HTTP_406_NOT_ACCEPTABLE,
+                data={"errors": serializer.errors},
+            )
+        title = serializer.validated_data["title"]
+        description = serializer.validated_data["description"]
+        duration = serializer.validated_data["duration"]
+        genre_id = serializer.validated_data["genre_id"]
+        tags = serializer.validated_data["tags"]
         movies = Movie.objects.create(
-            title=title,
-            description=description,
-            duration=duration,
-            genre_id=genre_id
-
-
+            title=title, description=description, duration=duration, genre_id=genre_id
         )
         movies.tags.set(tags)
         movies.save()
-        return Response(status=status.HTTP_201_CREATED,
-                        data={'message': 'Movie created',
-                              'movies': MovieDetailSerializers(movies).data})
+        return Response(
+            status=status.HTTP_201_CREATED,
+            data={
+                "message": "Movie created",
+                "movies": MovieDetailSerializers(movies).data,
+            },
+        )
 
 
-@api_view(['GET','PUT', 'DELETE'])
+@api_view(["GET", "PUT", "DELETE"])
 def movie_detail_view(request, id):
     try:
         movies = Movie.objects.get(id=id)
     except Movie.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND,
-                        data={'error': 'no such movie!'})
+        return Response(
+            status=status.HTTP_404_NOT_FOUND, data={"error": "no such movie!"}
+        )
     # Получить все отзывы фильтр
     # reviews = movies.reviews.all()
     # Отзывы по фильму ручной филтр
     # reviews = Review.objects.filter(movies=movies)
     movies = Movie.objects.get(id=id)
-    if request.method == 'GET':
+    if request.method == "GET":
         data = MovieDetailSerializers(movies, many=False).data
         return Response(data=data)
-    elif request.method == 'DELETE':
+    elif request.method == "DELETE":
         movies.delete()
         return Response(data={"message": "Movie removed"})
+    serializer = MovieValidateSerializer(data=request.data)
+    if not serializer.is_valid():
+        return Response(
+            status=status.HTTP_406_NOT_ACCEPTABLE, data={"errors": serializer.errors}
+        )
     else:
-        movies.title = request.data.get('title', '')
-        movies.description = request.data.get('description')
-        movies.duration = request.data.get('duration')
-        movies.genre_id = request.data.get('genre_id')
-        movies.tags.set(request.data.get('tags', []))
+        movies.title = serializer.validated_data["title"]
+        movies.description = serializer.validated_data["description"]
+        movies.duration = serializer.validated_data["duration"]
+        movies.genre_id = serializer.validated_data["genre_id"]
+        movies.tags.set(serializer.validated_data["tags"])
         movies.save()
-        return Response(data=MovieDetailSerializers(movies).data )
+        return Response(data=MovieDetailSerializers(movies).data)
 
-@api_view(['GET'])
+
+@api_view(["GET"])
 def static_data_view(request):
-    dict_ = {
-        'key': 'good'
-    }
+    dict_ = {"key": "good"}
     return Response(data=dict_)

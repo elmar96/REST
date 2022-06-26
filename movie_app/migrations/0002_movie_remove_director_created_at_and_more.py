@@ -7,46 +7,73 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('movie_app', '0001_initial'),
+        ("movie_app", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Movie',
+            name="Movie",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.TextField(blank=True, null=True)),
-                ('description', models.TextField(blank=True, null=True)),
-                ('duration', models.PositiveIntegerField()),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("title", models.TextField(blank=True, null=True)),
+                ("description", models.TextField(blank=True, null=True)),
+                ("duration", models.PositiveIntegerField()),
             ],
         ),
         migrations.RemoveField(
-            model_name='director',
-            name='created_at',
+            model_name="director",
+            name="created_at",
         ),
         migrations.RemoveField(
-            model_name='director',
-            name='price',
+            model_name="director",
+            name="price",
         ),
         migrations.RemoveField(
-            model_name='director',
-            name='text',
+            model_name="director",
+            name="text",
         ),
         migrations.RemoveField(
-            model_name='director',
-            name='updated_date',
+            model_name="director",
+            name="updated_date",
         ),
         migrations.CreateModel(
-            name='Review',
+            name="Review",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('text', models.TextField(blank=True, null=True)),
-                ('movie', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='movies', to='movie_app.movie')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("text", models.TextField(blank=True, null=True)),
+                (
+                    "movie",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="movies",
+                        to="movie_app.movie",
+                    ),
+                ),
             ],
         ),
         migrations.AddField(
-            model_name='movie',
-            name='director',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='directors', to='movie_app.director'),
+            model_name="movie",
+            name="director",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="directors",
+                to="movie_app.director",
+            ),
         ),
     ]

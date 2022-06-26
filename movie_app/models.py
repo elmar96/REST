@@ -1,5 +1,4 @@
 from django.db import models
-from django.db.models import Avg
 
 
 class Directors(models.Model):
@@ -21,14 +20,14 @@ class Tag(models.Model):
 
 
 class Movie(models.Model):
-    genre = models.ForeignKey(Genre,
-                              on_delete=models.CASCADE,
-                              null=True)
+    genre = models.ForeignKey(Genre, on_delete=models.CASCADE, null=True)
     tags = models.ManyToManyField(Tag, blank=True)
     title = models.TextField(null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     duration = models.PositiveIntegerField(null=True)
-    director = models.ForeignKey(Directors, on_delete=models.CASCADE,null=True, related_name="directors")
+    director = models.ForeignKey(
+        Directors, on_delete=models.CASCADE, null=True, related_name="directors"
+    )
 
     # def __str__(self):
     #     return self.name
@@ -42,7 +41,6 @@ class Movie(models.Model):
     #     Movie.objects.aggregate(Avg('rating'))
     #     return
 
-
     def rating(self):
         reviews = self.reviews.all()
         if not reviews:
@@ -54,18 +52,18 @@ class Movie(models.Model):
 
 
 STAR_CHOICES = (
-    (1, '*'),
-    (2, '**'),
-    (3, '***'),
-    (4, '****'),
-    (5, '*****'),
+    (1, "*"),
+    (2, "**"),
+    (3, "***"),
+    (4, "****"),
+    (5, "*****"),
 )
 
 
 class Review(models.Model):
     text = models.TextField(null=True, blank=True)
     stars = models.IntegerField(default=1, choices=STAR_CHOICES)
-    movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='reviews')
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name="reviews")
 
     def __str__(self):
         return self.text
