@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import Directors, Movie, Review, Genre, Tag
 from rest_framework.exceptions import ValidationError
-
+from django.contrib.auth.models import User
 
 class ReviewSerializers(serializers.ModelSerializer):
     class Meta:
@@ -99,3 +99,18 @@ class ReviewValidateSerializer(serializers.Serializer):
 
 class DirectorValidateSerializer(serializers.Serializer):
     name = serializers.CharField()
+
+
+class UserLoginSerializer(serializers.Serializer):
+    username = serializers.CharField()
+    password = serializers.CharField()
+
+
+class UserCreateSerializer(serializers.Serializer):
+    username = serializers.CharField()
+    password = serializers.CharField()
+
+    def validate_username(self, username):
+        if User.objects.filter(username=username).count()>0:
+            raise ValidationError('Пользователь с таким именем уже существует!')
+        return username

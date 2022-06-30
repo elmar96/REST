@@ -11,5 +11,6 @@ urlpatterns = [
     path('api/v1/directors/<int:id>/', views.director_detail_view),
     path('api/v1/review/', views.review_list_view),
     path('api/v1/review/<int:id>/', views.review_detail_view),
-
+    path('api/v1/login/', views.login_view),
+    path('api/v1/register/', views.register_view),
 ]
