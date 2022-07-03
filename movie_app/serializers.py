@@ -3,6 +3,7 @@ from .models import Directors, Movie, Review, Genre, Tag
 from rest_framework.exceptions import ValidationError
 from django.contrib.auth.models import User
 
+
 class ReviewSerializers(serializers.ModelSerializer):
     class Meta:
         model = Review
@@ -60,35 +61,38 @@ class ReviewDetailSerializers(serializers.ModelSerializer):
         model = Review
         fields = "__all__"
 
+
 # class GenreObjectSerializer(serializers.Serializer):
 #     id = serializers.IntegerField()
 #     name = serializers.CharField()
 
+
 class MovieValidateSerializer(serializers.Serializer):
     title = serializers.CharField()
-    description = serializers.CharField(required=False,default='')
+    description = serializers.CharField(required=False, default="")
     duration = serializers.FloatField(min_value=0.1)
     genre_id = serializers.IntegerField(allow_null=True, required=False, default=None)
     # genre = GenreObjectSerializer()
     tags = serializers.ListField(child=serializers.IntegerField())
 
-    def validate_genre_id(self,genre_id):
-        #Лучще использовать этот метод еогда много обьектов
+    def validate_genre_id(self, genre_id):
+        # Лучще использовать этот метод еогда много обьектов
         # try:
         #     Genre.objects.get(id=genre_id)
         # except Genre.DoesNotExist:
         #     raise ValidationError('Genre not found')
         genres = Genre.objects.filter(id=genre_id)
         if genres.count() == 0:
-            raise ValidationError(f"Жанр с идентификационным номером '{genre_id}' не найден!")
+            raise ValidationError(
+                f"Жанр с идентификационным номером '{genre_id}' не найден!"
+            )
         return genre_id
 
     def validate_tags(self, tags):
         tag_list = Tag.objects.filter(id__in=tags)
-        if tag_list.count()!=len(set(tags)):
+        if tag_list.count() != len(set(tags)):
             raise ValidationError("Tag not found")
         return tags
-
 
 
 class ReviewValidateSerializer(serializers.Serializer):
@@ -111,6 +115,6 @@ class UserCreateSerializer(serializers.Serializer):
     password = serializers.CharField()
 
     def validate_username(self, username):
-        if User.objects.filter(username=username).count()>0:
-            raise ValidationError('Пользователь с таким именем уже существует!')
+        if User.objects.filter(username=username).count() > 0:
+            raise ValidationError("Пользователь с таким именем уже существует!")
         return username
